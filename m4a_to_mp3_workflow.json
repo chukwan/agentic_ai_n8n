@@ -1,0 +1,90 @@
+{
+  "name": "M4A to MP3 Conversion",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook-m4a-to-mp3",
+        "responseMode": "onReceived",
+        "options": {
+          "binaryData": true,
+          "rawBody": true
+        }
+      },
+      "id": "0f9e8d7c-6a5b-4c3d-2e1f-0a9b8c7d6e5f",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        800,
+        300
+      ],
+      "webhookId": "YOUR_WEBHOOK_ID_HERE"
+    },
+    {
+      "parameters": {
+        "command": "ffmpeg -i",
+        "args": {
+          "values": [
+            {
+              "arg": "-vn"
+            },
+            {
+              "arg": "-b:a"
+            },
+            {
+              "arg": "192k"
+            },
+            {
+              "arg": "output.mp3"
+            }
+          ]
+        },
+        "options": {
+          "binaryDataInput": "data",
+          "binaryDataOutput": "file",
+          "binaryOutputFileName": "output.mp3",
+          "binaryPropertyName": "data",
+          "executionTimeout": 300
+        }
+      },
+      "id": "1a2b3c4d-5e6f-7g8h-9i0j-k1l2m3n4o5p6",
+      "name": "Convert M4A to MP3",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1.1,
+      "position": [
+        1000,
+        300
+      ],
+      "notes": "Requires FFmpeg to be installed and accessible in the PATH on the n8n worker executing this workflow.\n\nCommand Breakdown:\n- ffmpeg -i [input_file.m4a]: Specifies input file (path automatically appended by n8n node).\n- -vn: Disables video recording (extracts only audio).\n- -b:a 192k: Sets audio bitrate to 192 kbps.\n- output.mp3: Specifies the output filename.",
+      "credentials": {}
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Convert M4A to MP3",
+            "input": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "pinData": {},
+  "versionId": "b7c8d9e0-f1a2-b3c4-d5e6-f7a8b9c0d1e2",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "id": "t1a2b3c4-d5e6-f7g8-h9i0-j1k2l3m4n5o6",
+      "name": "FFmpeg"
+    },
+    {
+      "id": "t7p8q9r0-s1t2-u3v4-w5x6-y7z8a9b0c1d2",
+      "name": "Audio Conversion"
+    }
+  ]
+}
