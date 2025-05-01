@@ -12,3 +12,4 @@ n8n-nodes-google-speech/.env*
 n8n-nodes-google-speech/.npm
 n8n-nodes-google-speech/.eslintcache
 fetch-url/*
+multi_tool_agent/.env
