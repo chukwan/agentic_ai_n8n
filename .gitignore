@@ -1,2 +1,14 @@
 # Ignore Python virtual environment directory
-.venv/
+.venv/*
+venv/*
+mcp_fetch_venv/*
+# n8n node project specific ignores
+n8n-nodes-google-speech/node_modules/
+n8n-nodes-google-speech/dist/
+n8n-nodes-google-speech/*.log
+n8n-nodes-google-speech/npm-debug.log*
+n8n-nodes-google-speech/yarn-error.log
+n8n-nodes-google-speech/.env*
+n8n-nodes-google-speech/.npm
+n8n-nodes-google-speech/.eslintcache
+fetch-url/*

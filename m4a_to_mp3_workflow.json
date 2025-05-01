@@ -1,90 +1,109 @@
 {
-  "name": "M4A to MP3 Conversion",
-  "nodes": [
-    {
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "webhook-m4a-to-mp3",
-        "responseMode": "onReceived",
-        "options": {
-          "binaryData": true,
-          "rawBody": true
-        }
-      },
-      "id": "0f9e8d7c-6a5b-4c3d-2e1f-0a9b8c7d6e5f",
-      "name": "Webhook Trigger",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 1.1,
-      "position": [
-        800,
-        300
-      ],
-      "webhookId": "YOUR_WEBHOOK_ID_HERE"
-    },
-    {
-      "parameters": {
-        "command": "ffmpeg -i",
-        "args": {
-          "values": [
-            {
-              "arg": "-vn"
-            },
-            {
-              "arg": "-b:a"
-            },
-            {
-              "arg": "192k"
-            },
-            {
-              "arg": "output.mp3"
-            }
-          ]
-        },
-        "options": {
-          "binaryDataInput": "data",
-          "binaryDataOutput": "file",
-          "binaryOutputFileName": "output.mp3",
-          "binaryPropertyName": "data",
-          "executionTimeout": 300
-        }
-      },
-      "id": "1a2b3c4d-5e6f-7g8h-9i0j-k1l2m3n4o5p6",
-      "name": "Convert M4A to MP3",
-      "type": "n8n-nodes-base.executeCommand",
-      "typeVersion": 1.1,
-      "position": [
-        1000,
-        300
-      ],
-      "notes": "Requires FFmpeg to be installed and accessible in the PATH on the n8n worker executing this workflow.\n\nCommand Breakdown:\n- ffmpeg -i [input_file.m4a]: Specifies input file (path automatically appended by n8n node).\n- -vn: Disables video recording (extracts only audio).\n- -b:a 192k: Sets audio bitrate to 192 kbps.\n- output.mp3: Specifies the output filename.",
-      "credentials": {}
-    }
-  ],
-  "connections": {
-    "Webhook Trigger": {
-      "main": [
-        [
-          {
-            "node": "Convert M4A to MP3",
-            "input": "main"
-          }
-        ]
-      ]
-    }
-  },
-  "settings": {},
-  "staticData": null,
-  "pinData": {},
-  "versionId": "b7c8d9e0-f1a2-b3c4-d5e6-f7a8b9c0d1e2",
-  "triggerCount": 0,
-  "tags": [
-    {
-      "id": "t1a2b3c4-d5e6-f7g8-h9i0-j1k2l3m4n5o6",
-      "name": "FFmpeg"
-    },
-    {
-      "id": "t7p8q9r0-s1t2-u3v4-w5x6-y7z8a9b0c1d2",
-      "name": "Audio Conversion"
-    }
-  ]
+	"name": "M4A to MP3 Conversion",
+	"nodes": [
+		{
+			"parameters": {
+				"filePath": "/data/input.m4a",
+				"options": {}
+			},
+			"name": "Read Input M4A File",
+			"type": "n8n-nodes-base.readBinaryFile",
+			"typeVersion": 1,
+			"position": [
+				250,
+				300
+			],
+			"id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+			"notes": "Reads the M4A file from the specified path inside the container. \n\n**IMPORTANT:** Update the 'File Path' parameter to the correct location of your M4A file within the container (e.g., /data/your_audio.m4a). Ensure you mount a volume when running the container (e.g., -v /local/path:/data)."
+		},
+		{
+			"parameters": {
+				"fileContent": "={{ $json.data }}",
+				"fileName": "={{ $json.fileName }}",
+				"options": {}
+			},
+			"name": "Write Input M4A",
+			"type": "n8n-nodes-base.writeBinaryFile",
+			"typeVersion": 1,
+			"position": [
+				450,
+				300
+			],
+			"id": "c3d4e5f6-a7b8-9012-3456-7890abcdef01",
+			"notes": "Writes the incoming M4A binary data (assumed to be in the 'data' property) to a file in the container's /home/node/ directory."
+		},
+		{
+			"parameters": {
+				"command": "=ffmpeg -i {{ $json.fileName }} -vn -ar 44100 -ac 2 -b:a 192k {{ $json.fileName.replace('.m4a', '.mp3') }}",
+				"options": {
+					"shell": true
+				}
+			},
+			"name": "Execute FFmpeg",
+			"type": "n8n-nodes-base.executeCommand",
+			"typeVersion": 1,
+			"position": [
+				650,
+				300
+			],
+			"id": "d4e5f6a7-b8c9-0123-4567-890abcdef012",
+			"notes": "Runs FFmpeg to convert the M4A to MP3.\nInput file: From 'Write Input M4A' node.\nOutput file: Same name, but .mp3 extension."
+		},
+		{
+			"parameters": {
+				"fileName": "={{ $(\"Write Input M4A\").item.json.fileName.replace('.m4a', '.mp3') }}",
+				"options": {}
+			},
+			"name": "Read Output MP3",
+			"type": "n8n-nodes-base.readBinaryFile",
+			"typeVersion": 1,
+			"position": [
+				850,
+				300
+			],
+			"id": "e5f6a7b8-c9d0-1234-5678-90abcdef0123",
+			"notes": "Reads the generated MP3 file back into the workflow."
+		}
+	],
+	"connections": {
+		"Read Input M4A File": {
+			"main": [
+				[
+					{
+						"node": "Write Input M4A",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Write Input M4A": {
+			"main": [
+				[
+					{
+						"node": "Execute FFmpeg",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Execute FFmpeg": {
+			"main": [
+				[
+					{
+						"node": "Read Output MP3",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		}
+	},
+	"active": false,
+	"settings": {},
+	"id": "m4a-to-mp3-conversion",
+	"meta": {
+		"templateCredsSetupCompleted": true
+	}
 }

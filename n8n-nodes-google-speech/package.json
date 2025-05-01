@@ -1,0 +1,45 @@
+{
+  "name": "n8n-nodes-google-speech",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc && gulp build:icons",
+    "dev": "tsc --watch",
+    "format": "prettier --write nodes credentials",
+    "lint": "eslint nodes credentials --ext .js,.ts",
+    "lint:fix": "eslint nodes credentials --ext .js,.ts --fix",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "n8n-community-node-package"
+  ],
+  "author": "",
+  "license": "MIT",
+  "description": "n8n node for Google Cloud Speech-to-Text API",
+  "dependencies": {
+    "@google-cloud/speech": "^7.0.1",
+    "n8n-core": "^1.14.1",
+    "n8n-workflow": "^1.82.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "@typescript-eslint/eslint-plugin": "^8.31.0",
+    "@typescript-eslint/parser": "^8.31.0",
+    "eslint": "^9.25.1",
+    "gulp": "^5.0.0",
+    "gulp-rename": "^2.0.0",
+    "gulp-replace": "^1.1.4",
+    "gulp-svgmin": "^4.1.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3"
+  },
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/GoogleSpeechApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/GoogleSpeech.node.js"
+    ]
+  }
+}
